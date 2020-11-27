@@ -2,6 +2,8 @@ import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.viewModelScope
+import androidx.room.Room
+import com.example.horairesbustb.database.AppDatabase
 import com.example.horairesbustb.database.CalendarDatabase
 import com.example.horairesbustb.model.Calendar
 import com.example.horairesbustb.repository.CalendarRepository
@@ -13,9 +15,13 @@ class CalendarViewModel(application: Application) : AndroidViewModel(application
     val getAllDataCalendar: LiveData<List<Calendar>>
     val calendarRepository: CalendarRepository
 
+    val db = Room.databaseBuilder(
+        application,
+        AppDatabase::class.java, "database-name"
+    ).build()
 
     init {
-        val calendarDao=CalendarDatabase.getDatabase(application).calendarDao()
+        val calendarDao=db.calendarDao()
         calendarRepository = CalendarRepository(calendarDao)
         getAllDataCalendar = calendarRepository.getAllDataCalendar
     }

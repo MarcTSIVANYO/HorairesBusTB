@@ -6,8 +6,8 @@ import androidx.room.PrimaryKey
 
 @Entity(tableName="calendars")
 data class Calendar (
-    @PrimaryKey(autoGenerate = true)
-    val id :Int,
+    @PrimaryKey()
+    val service_id :Int,
     @ColumnInfo(name = "monday")
     val MONDAY  : String?,
     @ColumnInfo(name = "thursday")
