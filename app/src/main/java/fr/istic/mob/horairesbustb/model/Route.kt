@@ -8,9 +8,9 @@ import androidx.room.PrimaryKey
 data class Route (
     @PrimaryKey()
     @ColumnInfo(name = "route_id")
-    val id :Int,
+    val id :String,
     @ColumnInfo(name = "agency_id")
-    val serviceId :Int,
+    val serviceId :String?,
     @ColumnInfo(name = "route_short_name")
     val shortName : String?,
     @ColumnInfo(name = "route_long_name")

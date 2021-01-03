@@ -9,7 +9,7 @@ import androidx.room.PrimaryKey
 data class Stop (
     @PrimaryKey
     @ColumnInfo(name = "stop_id")
-    val id :Int,
+    val id :String,
     @ColumnInfo(name = "stop_code")
     val code : String?,
     @ColumnInfo(name = "stop_name")

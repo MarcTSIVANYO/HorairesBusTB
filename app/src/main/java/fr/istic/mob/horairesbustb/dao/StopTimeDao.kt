@@ -11,7 +11,7 @@ interface StopTimeDao {
     fun getAllDataStopTime(): LiveData<List<StopTime>>
 
     @Insert(onConflict = OnConflictStrategy.IGNORE)
-    suspend fun addStopTime(stopTime: StopTime)
+     fun addStopTime(stopTime: StopTime)
 
     @Insert(onConflict = OnConflictStrategy.IGNORE )
     fun addAllStopTimes(stopTimes: MutableSet<StopTime>)

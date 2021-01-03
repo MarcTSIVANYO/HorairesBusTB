@@ -11,9 +11,9 @@ interface TripDao {
     fun getAllDataTrip(): LiveData<List<Trip>>
 
     @Insert(onConflict = OnConflictStrategy.IGNORE)
-    suspend fun addTrip(trip: Trip)
+     fun addTrip(trip: Trip)
 
-    @Insert(onConflict = OnConflictStrategy.IGNORE )
+    @Insert(onConflict = OnConflictStrategy.IGNORE)
     fun addAllTrips(trips: MutableSet<Trip>)
 
     @Update
@@ -21,6 +21,4 @@ interface TripDao {
 
     @Delete
     suspend fun deleteTrip(trip: Trip)
-
-
 }

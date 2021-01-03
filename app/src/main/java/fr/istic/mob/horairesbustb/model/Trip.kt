@@ -8,12 +8,12 @@ import androidx.room.PrimaryKey
 @Entity(tableName="trips")
 data class Trip (
     @ColumnInfo(name = "route_id")
-    val routeId : Int?,
+    val routeId : String?,
     @ColumnInfo(name = "service_id")
-    val serviceId : Int?,
+    val serviceId : String?,
     @PrimaryKey()
     @ColumnInfo(name = "trip_id")
-    val id :Int,
+    val id :String,
     @ColumnInfo(name = "trip_headsign")
     val headSign : String?,
     @ColumnInfo(name = "trip_short_name")

@@ -9,13 +9,13 @@ data class StopTime (
     @PrimaryKey(autoGenerate = true)
     val id :Int,
     @ColumnInfo(name = "trip_id")
-    val tripId : Int?,
+    val tripId : String?,
     @ColumnInfo(name = "arrival_time")
-    val arrival : Int?,
+    val arrival : String?,
     @ColumnInfo(name = "departure_time")
-    val departure : Int?,
+    val departure : String?,
     @ColumnInfo(name = "stop_id")
-    val stopId : Int?,
+    val stopId : String?,
     @ColumnInfo(name = "stop_sequence")
     val sequence : String?,
     @ColumnInfo(name = "stop_headsign")

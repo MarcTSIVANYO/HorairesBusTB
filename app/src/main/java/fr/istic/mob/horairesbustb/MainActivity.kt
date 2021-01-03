@@ -8,23 +8,25 @@ import android.os.Bundle
 import android.os.Environment
 import android.os.Handler
 import android.system.Os
+import android.util.Log
 import android.view.View
 import android.widget.*
+import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import androidx.room.Room
-import fr.istic.mob.horairesbustb.database.AppDatabase
-import fr.istic.mob.horairesbustb.model.*
-import fr.istic.mob.horairesbustb.services.Dezipper
-import fr.istic.mob.horairesbustb.utils.DATABASE_NAME
-import fr.istic.mob.horairesbustb.utils.URL
-import fr.istic.mob.horairesbustb.utils.downloadTitle
+import androidx.work.impl.WorkDatabaseMigrations
 import com.google.gson.Gson
 import com.loopj.android.http.AsyncHttpClient
 import com.loopj.android.http.BinaryHttpResponseHandler
 import com.loopj.android.http.JsonHttpResponseHandler
 import cz.msebera.android.httpclient.Header
+import fr.istic.mob.horairesbustb.database.AppDatabase
 import fr.istic.mob.horairesbustb.model.*
 import fr.istic.mob.horairesbustb.model.Calendar
+import fr.istic.mob.horairesbustb.services.Dezipper
+import fr.istic.mob.horairesbustb.utils.DATABASE_NAME
+import fr.istic.mob.horairesbustb.utils.URL
+import fr.istic.mob.horairesbustb.utils.downloadTitle
 import org.json.JSONArray
 import org.json.JSONException
 import org.json.JSONObject
@@ -46,6 +48,7 @@ class MainActivity :  AppCompatActivity()  {
     private var i = 0
     private val handler = Handler()
     private var txtView: TextView? = null
+    @RequiresApi(Build.VERSION_CODES.KITKAT)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
@@ -67,10 +70,11 @@ class MainActivity :  AppCompatActivity()  {
         }
     }
 
+    @RequiresApi(Build.VERSION_CODES.KITKAT)
     fun beginDownload(){
         val mydownloadFolder = File(
-            applicationContext.getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS),
-            folder
+                applicationContext.getExternalFilesDir(Environment.DIRECTORY_DOCUMENTS),
+                folder
         )
         if (!mydownloadFolder.exists()){
             mydownloadFolder.mkdir();
@@ -90,27 +94,27 @@ class MainActivity :  AppCompatActivity()  {
         else
             downloadPathArray[5] + ".json"
         request.setDestinationInExternalFilesDir(
-            applicationContext,
-            Environment.DIRECTORY_DOWNLOADS + "/" + folder,
-            path
+                applicationContext,
+                Environment.DIRECTORY_DOCUMENTS + "/" + folder,
+                path
         ) // Storage directory path
+
+        //Log.d("tets",  ""+path)
         var dm:DownloadManager=getSystemService(Context.DOWNLOAD_SERVICE) as DownloadManager
         dm.enqueue(request)
-        //dezipperFile(mydownloadFolder.absolutePath+"/"+path)
         getJsonDataFromAsset(mydownloadFolder.absolutePath + "/" + path)
-        //dezipperFile(mydownloadFolder.absolutePath+"/"+path)
+        //getJsonDataFromAsset(applicationContext.getExternalFilesDir(Environment.DIRECTORY_DOCUMENTS) + "/" + folder + "/" + path)
     }
 
     fun doawnload(){
-        //startService( Intent(this, DownloadManagerService::class.java))
-
         var client:AsyncHttpClient = AsyncHttpClient()
         client.addHeader("mimetype", "application/octect-stream")
         client[URL, object : JsonHttpResponseHandler() {
+            @RequiresApi(Build.VERSION_CODES.KITKAT)
             override fun onSuccess(
-                statusCode: Int,
-                headers: Array<out Header>?,
-                response: JSONArray?
+                    statusCode: Int,
+                    headers: Array<out Header>?,
+                    response: JSONArray?
             ) {
                 try {
                     var record: JSONArray? = response
@@ -123,11 +127,11 @@ class MainActivity :  AppCompatActivity()  {
             }
         }]
     }
+    @RequiresApi(Build.VERSION_CODES.KITKAT)
     fun getJsonDataFromAsset(fileName: String) {
-        val url = BufferedReader(FileReader(File(fileName)))
-
+        //Log.d("tets",  ""+fileName)
         val file = File(
-            fileName
+                fileName
         )
         val fileReader = FileReader(file)
         val bufferedReader = BufferedReader(fileReader)
@@ -144,20 +148,21 @@ class MainActivity :  AppCompatActivity()  {
         val  dateFormat:SimpleDateFormat =  SimpleDateFormat("yyyy-MM-dd");
         val dateToday =  dateFormat.parse(dateFormat.format(Date()))
         version.forEach {
-            val debut = dateFormat.parse(""+it.field.dateDebut)
-            val fin = dateFormat.parse(""+it.field.dateFin)
+            val debut = dateFormat.parse("" + it.field.dateDebut)
+            val fin = dateFormat.parse("" + it.field.dateFin)
             if (dateToday>=debut && dateToday<=fin)
             {
                 currentUrl =it.field.url
             }
         }
         dezipperFile(currentUrl)
-
     }
+
+    @RequiresApi(Build.VERSION_CODES.KITKAT)
     fun dezipperFile(url: String){
         var client:AsyncHttpClient = AsyncHttpClient()
         val type = arrayOf(
-            "application/octect-stream"
+                "application/octect-stream"
         )
         client.get(url, object : BinaryHttpResponseHandler(type) {
             override fun onStart() {
@@ -165,15 +170,15 @@ class MainActivity :  AppCompatActivity()  {
                 loaderBar(true)
             }
 
-            override fun onSuccess(
-                statusCode: Int,
-                headers: Array<out Header>?,
-                binaryData: ByteArray?
+            override  fun onSuccess(
+                    statusCode: Int,
+                    headers: Array<out Header>?,
+                    binaryData: ByteArray?
             ) {
                 try {
                     val name: String = url.substring(url.lastIndexOf("/") + 1, url.length)
 
-                    val dirFile = File(getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS), folder)
+                    val dirFile = File(getExternalFilesDir(Environment.DIRECTORY_DOCUMENTS), folder)
                     if (!dirFile.exists()) {
                         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
                             Os.mkdir(dirFile.absolutePath, 0)
@@ -191,22 +196,22 @@ class MainActivity :  AppCompatActivity()  {
 
                     var dzip = Dezipper(file.absolutePath, exportPath)
                     dzip.unzip()
-                    InsertDataToDatabase()
+                    InsertDataToDatabase(exportPath)
                 } catch (e: IOException) {
                     e.printStackTrace()
                 }
             }
 
             override fun onFailure(
-                statusCode: Int,
-                headers: Array<out Header>?,
-                binaryData: ByteArray?,
-                error: Throwable?
+                    statusCode: Int,
+                    headers: Array<out Header>?,
+                    binaryData: ByteArray?,
+                    error: Throwable?
             ) {
                 Toast.makeText(
-                    this@MainActivity,
-                    "Echec de synchronisation de donnée",
-                    Toast.LENGTH_SHORT
+                        this@MainActivity,
+                        "Echec de synchronisation de donnée",
+                        Toast.LENGTH_SHORT
                 ).show();
             }
 
@@ -218,51 +223,47 @@ class MainActivity :  AppCompatActivity()  {
     }
 
     private fun loaderBar(b: Boolean) {
-
         when (b) {
             true -> linearLayout!!.visibility = View.VISIBLE
             false -> linearLayout!!.visibility = View.GONE
         }
     }
 
-
-
-    private fun InsertDataToDatabase(){
-        //Log.d("String", "String")
+    private  fun InsertDataToDatabase(path:String){
         val db = Room.databaseBuilder(
-            applicationContext,
-            AppDatabase::class.java, DATABASE_NAME
-        ).build()
+                applicationContext,
+                AppDatabase::class.java, DATABASE_NAME
+        ).allowMainThreadQueries()
+            .fallbackToDestructiveMigrationFrom(1,2,3,4)
+            .build()
 
-
-        val storageDir = getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS)
-       //Insert into trips
-        val tripFile = File(storageDir, "trips.txt")
-        val tripReader = BufferedReader(FileReader(tripFile))
-        var tripCurrentLine = tripReader.readLine();
-        val trips: MutableSet<Trip> = mutableSetOf()
-        while (tripCurrentLine !=null){
-            val values = tripCurrentLine.split(",").toTypedArray()
-            trips.add(
-                Trip(
-                    values[0].toInt(),
-                    values[1].toInt(),
-                    values[2].toInt(),
+        //Insert into calendars
+        val calendarTimesFile = File(path, "calendar.txt")
+        val calendarReader = BufferedReader(FileReader(calendarTimesFile))
+        var calendarCurrentLine = calendarReader.readLine();
+        val calendars: MutableSet<Calendar> = mutableSetOf();
+        while (calendarCurrentLine !=null){
+            val values = calendarCurrentLine.split(",").toTypedArray()
+            calendars.add(
+                Calendar(
+                    values[0].toString(),
+                    values[1].toString(),
+                    values[2].toString(),
                     values[3].toString(),
                     values[4].toString(),
                     values[5].toString(),
                     values[6].toString(),
                     values[7].toString(),
-                    values[8].toString(),
-                    values[9].toString()
+                    values[8].toString()
                 )
             );
+            calendarCurrentLine = calendarReader.readLine();
         }
-        db.tripDao().addAllTrips(trips);
-        //End insert into trips
+        db.calendarDao().addAllCalendars(calendars);
+        //End insert into calendars
 
         //Insert into routes
-        val routeFile = File(storageDir, "routes.txt")
+        val routeFile = File(path, "routes.txt")
         val routeReader = BufferedReader(FileReader(routeFile))
         var routeCurrentLine = routeReader.readLine();
         val routes: MutableSet<Route> = mutableSetOf();
@@ -270,8 +271,8 @@ class MainActivity :  AppCompatActivity()  {
             val values = routeCurrentLine.split(",").toTypedArray()
             routes.add(
                 Route(
-                    values[0].toInt(),
-                    values[1].toInt(),
+                    values[0].toString(),
+                    values[1].toString(),
                     values[2].toString(),
                     values[3].toString(),
                     values[4].toString(),
@@ -282,20 +283,21 @@ class MainActivity :  AppCompatActivity()  {
                     values[9].toString()
                 )
             );
+            routeCurrentLine=routeReader.readLine();
         }
         db.routeDao().addAllRoutes(routes);
         //End insert into routes
 
         //Insert into stops
-        val stopFile = File(storageDir, "stops.txt")
-        val stopReader = BufferedReader(FileReader(routeFile))
-        var stopCurrentLine = routeReader.readLine();
+        val stopFile = File(path, "stops.txt")
+        val stopReader = BufferedReader(FileReader(stopFile))
+        var stopCurrentLine = stopReader.readLine();
         val stops: MutableSet<Stop> = mutableSetOf();
         while (stopCurrentLine !=null){
             val values = stopCurrentLine.split(",").toTypedArray()
             stops.add(
                 Stop(
-                    values[0].toInt(),
+                    values[0].toString(),
                     values[1].toString(),
                     values[2].toString(),
                     values[3].toString(),
@@ -309,46 +311,18 @@ class MainActivity :  AppCompatActivity()  {
                     values[11].toString()
                 )
             );
+            stopCurrentLine = stopReader.readLine();
         }
         db.stopDao().addAllStops(stops);
         //End insert into stops
 
-        //Insert into stopTimes
-        val stopTimesFile = File(storageDir, "stop_times.txt")
-        val stopTimeReader = BufferedReader(FileReader(routeFile))
-        var stopTimeCurrentLine = routeReader.readLine();
-        val stopTimes: MutableSet<StopTime> = mutableSetOf();
-        while (stopTimeCurrentLine !=null){
-            val values = stopTimeCurrentLine.split(",").toTypedArray()
-            stopTimes.add(
-                StopTime(
-                    values[0].toInt(),
-                    values[1].toInt(),
-                    values[2].toInt(),
-                    values[3].toInt(),
-                    values[4].toInt(),
-                    values[5].toString(),
-                    values[6].toString(),
-                    values[7].toString(),
-                    values[8].toString(),
-                    values[9].toString()
-                )
-            );
-        }
-        db.stopTimeDao().addAllStopTimes(stopTimes);
-        //End insert into stopTimes
-
-
-        //Insert into calendars
-        val calendarTimesFile = File(storageDir, "calendar.txt")
-        val calendarReader = BufferedReader(FileReader(routeFile))
-        var calendarCurrentLine = routeReader.readLine();
-        val calendars: MutableSet<Calendar> = mutableSetOf();
-        while (calendarCurrentLine !=null){
-            val values = calendarCurrentLine.split(",").toTypedArray()
-            calendars.add(
-                Calendar(
-                    values[0].toInt(),
+        //Insert into trips
+        var trip: Trip;
+        File(path, "trips.txt").useLines { lines -> lines.forEach {
+            val values = it.split(",").toTypedArray()
+            //trips.add(
+            trip= Trip(
+                    values[0].toString(),
                     values[1].toString(),
                     values[2].toString(),
                     values[3].toString(),
@@ -356,12 +330,34 @@ class MainActivity :  AppCompatActivity()  {
                     values[5].toString(),
                     values[6].toString(),
                     values[7].toString(),
-                    values[8].toString()
-                )
+                    values[8].toString(),
+                    values[9].toString()
             );
+            db.tripDao().addTrip(trip);
+            }
         }
-        db.calendarDao().addAllCalendars(calendars);
-        //End insert into calendars
+        //End insert into trips
+
+        //Insert into stopTimes
+        var stopTime: StopTime;
+        File(path, "stop_times.txt").useLines { lines -> lines.forEach {
+            val values = it.split(",").toTypedArray()
+            //trips.add(
+            stopTime=StopTime(0,
+                values[0].toString(),
+                values[1].toString(),
+                values[2].toString(),
+                values[3].toString(),
+                values[4].toString(),
+                values[5].toString(),
+                values[6].toString(),
+                values[7].toString(),
+                values[8].toString()
+            )
+            db.stopTimeDao().addStopTime(stopTime)
+            }
+        }
+        //End insert into stopTimes
     }
 }
 

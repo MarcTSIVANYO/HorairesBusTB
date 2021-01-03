@@ -8,7 +8,7 @@ import androidx.room.PrimaryKey
 data class Calendar (
     @PrimaryKey()
     @ColumnInfo(name = "service_id")
-    val serviceId :Int,
+    val serviceId :String,
     val monday  : String?,
     val thursday  : String?,
     val wednesday  : String?,
