@@ -6,19 +6,15 @@ import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.os.Environment
-import android.os.Handler
 import android.system.Os
-import android.util.Log
 import android.view.View
 import android.widget.*
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import androidx.room.Room
-import androidx.work.impl.WorkDatabaseMigrations
 import com.google.gson.Gson
 import com.loopj.android.http.AsyncHttpClient
 import com.loopj.android.http.BinaryHttpResponseHandler
-import com.loopj.android.http.JsonHttpResponseHandler
 import cz.msebera.android.httpclient.Header
 import fr.istic.mob.horairesbustb.database.AppDatabase
 import fr.istic.mob.horairesbustb.model.*
@@ -27,27 +23,18 @@ import fr.istic.mob.horairesbustb.services.Dezipper
 import fr.istic.mob.horairesbustb.utils.DATABASE_NAME
 import fr.istic.mob.horairesbustb.utils.URL
 import fr.istic.mob.horairesbustb.utils.downloadTitle
-import org.json.JSONArray
-import org.json.JSONException
-import org.json.JSONObject
 import java.io.*
 import java.text.SimpleDateFormat
 import java.util.*
 
+@Suppress("NULLABILITY_MISMATCH_BASED_ON_JAVA_ANNOTATIONS")
 class MainActivity :  AppCompatActivity()  {
 
     var exportPath:String =""
    // var progress: LinearLayout? = findViewById<LinearLayout>(R.id.progress)
     private lateinit var download_btn: Button
     private val folder ="starBus/"
-    var mydownloadFolderid:Long =0
-
-    private var progressBar: ProgressBar? = null
-
     private var linearLayout: LinearLayout? = null
-    private var i = 0
-    private val handler = Handler()
-    private var txtView: TextView? = null
     @RequiresApi(Build.VERSION_CODES.KITKAT)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -61,13 +48,12 @@ class MainActivity :  AppCompatActivity()  {
 
             beginDownload()
 
-            //linearLayout!!.visibility = View.GONE
-            //Toast.makeText(this@MainActivity, "Its toast!", Toast.LENGTH_SHORT).show();
-        }
-
-        if (savedInstanceState != null) {
 
         }
+
+       /* if (savedInstanceState != null) {
+
+        }*/
     }
 
     @RequiresApi(Build.VERSION_CODES.KITKAT)
@@ -77,7 +63,7 @@ class MainActivity :  AppCompatActivity()  {
                 folder
         )
         if (!mydownloadFolder.exists()){
-            mydownloadFolder.mkdir();
+            mydownloadFolder.mkdir()
         }
 
         val uri = Uri.parse(URL)
@@ -105,7 +91,7 @@ class MainActivity :  AppCompatActivity()  {
         getJsonDataFromAsset(mydownloadFolder.absolutePath + "/" + path)
         //getJsonDataFromAsset(applicationContext.getExternalFilesDir(Environment.DIRECTORY_DOCUMENTS) + "/" + folder + "/" + path)
     }
-
+/*
     fun doawnload(){
         val client:AsyncHttpClient = AsyncHttpClient()
         client.addHeader("mimetype", "application/octect-stream")
@@ -126,6 +112,7 @@ class MainActivity :  AppCompatActivity()  {
             }
         }]
     }
+    */
     @RequiresApi(Build.VERSION_CODES.KITKAT)
     fun getJsonDataFromAsset(fileName: String) {
         //Log.d("tets",  ""+fileName)
@@ -144,8 +131,8 @@ class MainActivity :  AppCompatActivity()  {
         val response = stringBuilder.toString()
         var currentUrl:String=""
         val version = Gson().fromJson(response, Array<Version>::class.java)
-        val  dateFormat:SimpleDateFormat =  SimpleDateFormat("yyyy-MM-dd");
-        val dateToday =  dateFormat.parse(dateFormat.format(Date()))
+        val  dateFormat:SimpleDateFormat =  SimpleDateFormat("yyyy-MM-dd")
+        val dateToday: Date =  dateFormat.parse(dateFormat.format(Date()))
         version.forEach {
             val debut = dateFormat.parse("" + it.field.dateDebut)
             val fin = dateFormat.parse("" + it.field.dateFin)
@@ -159,7 +146,7 @@ class MainActivity :  AppCompatActivity()  {
 
     @RequiresApi(Build.VERSION_CODES.KITKAT)
     fun dezipperFile(url: String){
-        var client:AsyncHttpClient = AsyncHttpClient()
+        val client:AsyncHttpClient = AsyncHttpClient()
         val type = arrayOf(
                 "application/octect-stream"
         )
@@ -193,9 +180,9 @@ class MainActivity :  AppCompatActivity()  {
                     exportPath = exportPath.replace(".zip", "")
                     exportPath = "$exportPath/"
 
-                    var dzip = Dezipper(file.absolutePath, exportPath)
+                    val dzip = Dezipper(file.absolutePath, exportPath)
                     dzip.unzip()
-                    InsertDataToDatabase(exportPath)
+                    insertIntoDatabase(exportPath)
                 } catch (e: IOException) {
                     e.printStackTrace()
                 }
@@ -211,7 +198,7 @@ class MainActivity :  AppCompatActivity()  {
                         this@MainActivity,
                         "Echec de synchronisation de donnée",
                         Toast.LENGTH_SHORT
-                ).show();
+                ).show()
             }
 
             override fun onFinish() {
@@ -228,7 +215,7 @@ class MainActivity :  AppCompatActivity()  {
         }
     }
 
-    private  fun InsertDataToDatabase(path:String){
+    private  fun insertIntoDatabase(path:String){
         val db = Room.databaseBuilder(
                 applicationContext,
                 AppDatabase::class.java, DATABASE_NAME
@@ -239,124 +226,126 @@ class MainActivity :  AppCompatActivity()  {
         //Insert into calendars
         val calendarTimesFile = File(path, "calendar.txt")
         val calendarReader = BufferedReader(FileReader(calendarTimesFile))
-        var calendarCurrentLine = calendarReader.readLine();
-        val calendars: MutableSet<Calendar> = mutableSetOf();
+        var calendarCurrentLine = calendarReader.readLine()
+        val calendars: MutableSet<Calendar> = mutableSetOf()
         while (calendarCurrentLine !=null){
             val values = calendarCurrentLine.split(",").toTypedArray()
             calendars.add(
                 Calendar(
-                    values[0].toString(),
-                    values[1].toString(),
-                    values[2].toString(),
-                    values[3].toString(),
-                    values[4].toString(),
-                    values[5].toString(),
-                    values[6].toString(),
-                    values[7].toString(),
-                    values[8].toString()
+                    values[0],
+                    values[1],
+                    values[2],
+                    values[3],
+                    values[4],
+                    values[5],
+                    values[6],
+                    values[7],
+                    values[8]
                 )
-            );
-            calendarCurrentLine = calendarReader.readLine();
+            )
+            calendarCurrentLine = calendarReader.readLine()
         }
-        db.calendarDao().addAllCalendars(calendars);
+        db.calendarDao().addAllCalendars(calendars)
         //End insert into calendars
 
         //Insert into routes
         val routeFile = File(path, "routes.txt")
         val routeReader = BufferedReader(FileReader(routeFile))
-        var routeCurrentLine = routeReader.readLine();
-        val routes: MutableSet<Route> = mutableSetOf();
+        var routeCurrentLine = routeReader.readLine()
+        val routes: MutableSet<Route> = mutableSetOf()
         while (routeCurrentLine !=null){
             val values = routeCurrentLine.split(",").toTypedArray()
             routes.add(
                 Route(
-                    values[0].toString(),
-                    values[1].toString(),
-                    values[2].toString(),
-                    values[3].toString(),
-                    values[4].toString(),
-                    values[5].toString(),
-                    values[6].toString(),
-                    values[7].toString(),
-                    values[8].toString(),
-                    values[9].toString()
+                    values[0],
+                    values[1],
+                    values[2],
+                    values[3],
+                    values[4],
+                    values[5],
+                    values[6],
+                    values[7],
+                    values[8],
+                    values[9]
                 )
             )
-            routeCurrentLine=routeReader.readLine();
+            routeCurrentLine=routeReader.readLine()
         }
-        db.routeDao().addAllRoutes(routes);
+        db.routeDao().addAllRoutes(routes)
         //End insert into routes
 
         //Insert into stops
         val stopFile = File(path, "stops.txt")
         val stopReader = BufferedReader(FileReader(stopFile))
-        var stopCurrentLine = stopReader.readLine();
-        val stops: MutableSet<Stop> = mutableSetOf();
+        var stopCurrentLine = stopReader.readLine()
+        val stops: MutableSet<Stop> = mutableSetOf()
         while (stopCurrentLine !=null){
             val values = stopCurrentLine.split(",").toTypedArray()
             stops.add(
                 Stop(
-                    values[0].toString(),
-                    values[1].toString(),
-                    values[2].toString(),
-                    values[3].toString(),
-                    values[4].toString(),
-                    values[5].toString(),
-                    values[6].toString(),
-                    values[7].toString(),
-                    values[8].toString(),
-                    values[9].toString(),
-                    values[10].toString(),
-                    values[11].toString()
+                    values[0],
+                    values[1],
+                    values[2],
+                    values[3],
+                    values[4],
+                    values[5],
+                    values[6],
+                    values[7],
+                    values[8],
+                    values[9],
+                    values[10],
+                    values[11]
                 )
             )
-            stopCurrentLine = stopReader.readLine();
+            stopCurrentLine = stopReader.readLine()
         }
-        db.stopDao().addAllStops(stops);
+        db.stopDao().addAllStops(stops)
         //End insert into stops
 
         //Insert into trips
-        var trip: Trip;
+        var trip: Trip
         File(path, "trips.txt").useLines { lines -> lines.forEach {
             val values = it.split(",").toTypedArray()
             //trips.add(
             trip= Trip(
-                    values[0].toString(),
-                    values[1].toString(),
-                    values[2].toString(),
-                    values[3].toString(),
-                    values[4].toString(),
-                    values[5].toString(),
-                    values[6].toString(),
-                    values[7].toString(),
-                    values[8].toString(),
-                    values[9].toString()
+                routeId = values[0],
+                serviceId = values[1],
+                id = values[2],
+                headSign = values[3],
+                shortName = values[4],
+                directionId = values[5],
+                blockId = values[6],
+                shapeId = values[7],
+                WHEELCHAIR_ACCESSIBLE = values[8],
+                bikesAllowed = values[9]
             )
-            db.tripDao().addTrip(trip);
+            db.tripDao().addTrip(trip)
             }
         }
         //End insert into trips
 
         //Insert into stopTimes
-        var stopTime: StopTime;
-        File(path, "stop_times.txt").useLines { lines -> lines.forEach {
+        var stopTime: StopTime
+        File(path, "stop_times.txt").useLines { lines -> lines.forEach { it ->
             val values = it.split(",").toTypedArray()
-            //trips.add(
-            stopTime=StopTime(0,
-                values[0].toString(),
-                values[1].toString(),
-                values[2].toString(),
-                values[3].toString(),
-                values[4].toString(),
-                values[5].toString(),
-                values[6].toString(),
-                values[7].toString(),
-                values[8].toString()
+            stopTime = StopTime(
+                0,
+                values[0],
+                values[1],
+                values[2],
+                values[3],
+                values[4],
+                values[5],
+                values[6],
+                values[7],
+                values[8]
             )
             db.stopTimeDao().addStopTime(stopTime)
             }
         }
         //End insert into stopTimes
+        linearLayout!!.visibility = View.GONE
+        Toast.makeText(this@MainActivity, "Opération effectué avec succès!", Toast.LENGTH_SHORT).show()
     }
 }
 
