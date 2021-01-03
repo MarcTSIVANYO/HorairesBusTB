@@ -80,8 +80,8 @@ class MainActivity :  AppCompatActivity()  {
             mydownloadFolder.mkdir();
         }
 
-        var uri = Uri.parse(URL)
-        var request :DownloadManager.Request=DownloadManager.Request(Uri.parse(URL))
+        val uri = Uri.parse(URL)
+        val request :DownloadManager.Request=DownloadManager.Request(Uri.parse(URL))
                 .setTitle(downloadTitle)
                 .setAllowedNetworkTypes(DownloadManager.Request.NETWORK_MOBILE or DownloadManager.Request.NETWORK_WIFI)
                 .setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED)
@@ -100,14 +100,14 @@ class MainActivity :  AppCompatActivity()  {
         ) // Storage directory path
 
         //Log.d("tets",  ""+path)
-        var dm:DownloadManager=getSystemService(Context.DOWNLOAD_SERVICE) as DownloadManager
+        val dm:DownloadManager=getSystemService(Context.DOWNLOAD_SERVICE) as DownloadManager
         dm.enqueue(request)
         getJsonDataFromAsset(mydownloadFolder.absolutePath + "/" + path)
         //getJsonDataFromAsset(applicationContext.getExternalFilesDir(Environment.DIRECTORY_DOCUMENTS) + "/" + folder + "/" + path)
     }
 
     fun doawnload(){
-        var client:AsyncHttpClient = AsyncHttpClient()
+        val client:AsyncHttpClient = AsyncHttpClient()
         client.addHeader("mimetype", "application/octect-stream")
         client[URL, object : JsonHttpResponseHandler() {
             @RequiresApi(Build.VERSION_CODES.KITKAT)
@@ -117,9 +117,8 @@ class MainActivity :  AppCompatActivity()  {
                     response: JSONArray?
             ) {
                 try {
-                    var record: JSONArray? = response
-                    var js: JSONObject = response!!.optJSONObject(0).getJSONObject("fields")
-                    var url: String = js.getString("url")
+                    val js: JSONObject = response!!.optJSONObject(0).getJSONObject("fields")
+                    val url: String = js.getString("url")
                     getJsonDataFromAsset(url)
                 } catch (e: JSONException) {
                     e.printStackTrace()
@@ -282,7 +281,7 @@ class MainActivity :  AppCompatActivity()  {
                     values[8].toString(),
                     values[9].toString()
                 )
-            );
+            )
             routeCurrentLine=routeReader.readLine();
         }
         db.routeDao().addAllRoutes(routes);
@@ -310,7 +309,7 @@ class MainActivity :  AppCompatActivity()  {
                     values[10].toString(),
                     values[11].toString()
                 )
-            );
+            )
             stopCurrentLine = stopReader.readLine();
         }
         db.stopDao().addAllStops(stops);
@@ -332,7 +331,7 @@ class MainActivity :  AppCompatActivity()  {
                     values[7].toString(),
                     values[8].toString(),
                     values[9].toString()
-            );
+            )
             db.tripDao().addTrip(trip);
             }
         }
