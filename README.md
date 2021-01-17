@@ -1,5 +1,6 @@
 # Horaires Bus   | Version 2
-Une application mobile gérant les horaires de bus du réseau STAR
+
+A mobile application managing the STAR network bus schedules
 
 ### Technos
 
@@ -18,5 +19,5 @@ Une application mobile gérant les horaires de bus du réseau STAR
 ### For training in
 ISTIC - Université de Rennes 1, Campus Beaulieu
 
-## Star1TB : Fournisseur du contenu
+## Star1TB : Content Provider
 - [Star1TB](https://github.com/MarcTSIVANYO/HorairesBusTB/tree/Star1TB)
