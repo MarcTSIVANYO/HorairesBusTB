@@ -1,5 +1,6 @@
 package fr.istic.mob.horairesbustb.dao
 
+import android.database.Cursor
 import androidx.lifecycle.LiveData
 import androidx.room.*
 import fr.istic.mob.horairesbustb.model.Route
@@ -8,7 +9,11 @@ import fr.istic.mob.horairesbustb.model.Route
 interface RouteDao {
 
     @Query(value = "SELECT * FROM routes ORDER BY route_id ASC")
-    fun getAllDataRoute(): LiveData<List<Route>>
+    fun getAllDataRoute(): Cursor
+
+
+    @Query(value = "SELECT route_long_name FROM routes WHERE route_id =:route_id")
+    fun getDirectionRoute(route_id:String?): String
 
     @Insert(onConflict = OnConflictStrategy.IGNORE)
     suspend fun addRoute(route: Route)
