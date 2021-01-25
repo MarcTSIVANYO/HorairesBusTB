@@ -25,7 +25,7 @@ class StopTimesFragment : Fragment() {
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
-        viewModel = ViewModelProvider(this).get(StopTimesViewModel::class.java)
+        //viewModel = ViewModelProvider(this).get(StopTimesViewModel::class.java)
         // TODO: Use the ViewModel
     }
 
