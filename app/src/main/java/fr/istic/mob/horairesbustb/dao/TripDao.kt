@@ -1,5 +1,6 @@
 package fr.istic.mob.horairesbustb.dao
 
+import android.database.Cursor
 import androidx.lifecycle.LiveData
 import androidx.room.*
 import fr.istic.mob.horairesbustb.model.Trip
@@ -8,7 +9,7 @@ import fr.istic.mob.horairesbustb.model.Trip
 @Dao
 interface TripDao {
     @Query(value = "SELECT * FROM trips ORDER BY trip_id ASC")
-    fun getAllDataTrip(): LiveData<List<Trip>>
+    fun getAllDataTrip(): Cursor
 
     @Insert(onConflict = OnConflictStrategy.IGNORE)
      fun addTrip(trip: Trip)

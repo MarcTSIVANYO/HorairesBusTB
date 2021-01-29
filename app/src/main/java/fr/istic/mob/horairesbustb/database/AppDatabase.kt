@@ -16,4 +16,22 @@ abstract class AppDatabase : RoomDatabase() {
     abstract fun stopTimeDao(): StopTimeDao
     abstract fun tripDao(): TripDao
 
+    companion object {
+        var appInstance: AppDatabase? = null
+        private val LOCK = Any()
+        val DATABASE_NAME = "star.db"
+        fun getInstance(context: Context): AppDatabase? {
+            if (appInstance == null) {
+                synchronized(LOCK) {
+                    appInstance = Room.databaseBuilder(
+                            context.applicationContext,
+                            AppDatabase::class.java, DATABASE_NAME
+                    )
+                            .allowMainThreadQueries() //ou le mettre dans une task
+                            .build()
+                }
+            }
+            return appInstance
+        }
+    }
 }

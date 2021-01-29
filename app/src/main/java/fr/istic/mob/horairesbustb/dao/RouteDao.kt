@@ -12,8 +12,8 @@ interface RouteDao {
     fun getAllDataRoute(): Cursor
 
 
-    @Query(value = "SELECT route_long_name FROM routes WHERE route_id =:route_id")
-    fun getDirectionRoute(route_id:String?): String
+    @Query(value = "SELECT * FROM routes WHERE route_id =:route_id")
+    fun getDirectionRoute(route_id:String?): Cursor
 
     @Insert(onConflict = OnConflictStrategy.IGNORE)
     suspend fun addRoute(route: Route)

@@ -37,7 +37,7 @@ class CalendarTest {
     @Test
     @Throws(Exception::class)
     suspend fun writeUserAndReadInList() {
-        val calendar: Calendar = Calendar(10, "lundi", "mardi", "mardi", "mardi", "mardi", "mardi", "mardi", "mardi")
+        val calendar: Calendar = Calendar("10", "lundi", "mardi", "mardi", "mardi", "mardi", "mardi", "mardi", "mardi")
         calendarDao.addCalendar(calendar)
         val calendarItem = calendarDao.findByTitle(calendar.monday.toString())
         assertThat(calendarItem, equalTo(calendar))

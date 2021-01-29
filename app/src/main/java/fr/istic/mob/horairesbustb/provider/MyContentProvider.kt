@@ -1,10 +1,12 @@
 package fr.istic.mob.horairesbustb.provider
 
 import android.content.ContentProvider
+import android.content.ContentUris
 import android.content.ContentValues
 import android.content.Context
 import android.database.Cursor
 import android.net.Uri
+import android.util.Log
 import androidx.room.Room
 import fr.istic.mob.horairesbustb.StarContract
 import fr.istic.mob.horairesbustb.database.AppDatabase
@@ -12,35 +14,53 @@ import fr.istic.mob.horairesbustb.utils.DATABASE_NAME
 
 class MyContentProvider : ContentProvider() {
 
-     private lateinit var db:  AppDatabase
+    private  var db: AppDatabase?=null
 
     override fun onCreate(): Boolean {
-         if(context==null){
-             throw  NullPointerException()
-         }
+        if (context == null) {
+            throw  NullPointerException()
+        }
+
+        Log.i("error", "test 1")
         db = Room.databaseBuilder(
-             context!!,
-             AppDatabase::class.java, DATABASE_NAME
-         ).allowMainThreadQueries()
-             .fallbackToDestructiveMigrationFrom(1,2,3,4)
-             .build()
+                context!!,
+                AppDatabase::class.java, DATABASE_NAME
+        ).allowMainThreadQueries()
+                .fallbackToDestructiveMigrationFrom(1, 2, 3, 4)
+                .build()
+        //db = AppDatabase.getInstance(context!!)
 
-         return true
-     }
+        return true
+    }
 
 
-     override fun query(uri: Uri, projection: Array<String>?, selection: String?,
-                        selectionArgs: Array<String>?, sortOrder: String?): Cursor? {
-         when (uri.toString()){
-             StarContract.BusRoutes.CONTENT_URI.toString()->db.routeDao().getAllDataRoute()
-             StarContract.Trips.CONTENT_URI.toString()->db.tripDao().getAllDataTrip()
-             StarContract.Stops.CONTENT_URI.toString()->db.stopDao().getAllDataStop()
-             StarContract.BusRoutes.CONTENT_URI.toString()->db.routeDao().getDirectionRoute(selectionArgs?.get(0))
-             StarContract.Stops.CONTENT_URI.toString()->db.stopDao().getStops(selectionArgs?.get(0),selectionArgs?.get(1))
-         }
+    override fun query(uri: Uri, projection: Array<String>?, selection: String?,
+                       selectionArgs: Array<String>?, sortOrder: String?): Cursor? {
 
-         throw UnsupportedOperationException("Not yet implemented")
-     }
+        var cursor: Cursor? = null
+        if (getContext() != null) {
+            when (uri.toString()) {
+                StarContract.BusRoutes.CONTENT_URI.toString() ->
+                    if(selectionArgs.isNullOrEmpty()){
+                        cursor = db?.routeDao()?.getAllDataRoute()
+                    }else{
+                        cursor = db?.routeDao()?.getDirectionRoute(selectionArgs?.get(0))
+                    }
+
+                StarContract.Trips.CONTENT_URI.toString() -> cursor = db?.tripDao()?.getAllDataTrip()
+                StarContract.Stops.CONTENT_URI.toString() -> cursor = db?.stopDao()?.getAllDataStop()
+                StarContract.Stops.CONTENT_URI.toString() ->
+                    if(selectionArgs.isNullOrEmpty()){
+                        cursor = db?.stopDao()?.getAllDataStop()
+                    }else{
+                        cursor = db?.stopDao()?.getStops(selectionArgs?.get(0), selectionArgs?.get(1))
+                    }
+                else -> throw IllegalArgumentException("Unknown URI")
+            }
+        }
+        cursor?.setNotificationUri(context?.contentResolver, uri)
+        return cursor
+    }
 
     override fun getType(uri: Uri): String? {
         TODO("Not yet implemented")
@@ -55,10 +75,10 @@ class MyContentProvider : ContentProvider() {
     }
 
     override fun update(
-        uri: Uri,
-        values: ContentValues?,
-        selection: String?,
-        selectionArgs: Array<out String>?
+            uri: Uri,
+            values: ContentValues?,
+            selection: String?,
+            selectionArgs: Array<out String>?
     ): Int {
         TODO("Not yet implemented")
     }
