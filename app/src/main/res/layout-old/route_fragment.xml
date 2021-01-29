@@ -4,7 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:id="@+id/firstFragment"
-    tools:context=".fragements.RouteFragment">
+    tools:context="fr.istic.mob.star2tb-old.fragements.RouteFragment">
 
     <LinearLayout
         android:layout_width="fill_parent"
