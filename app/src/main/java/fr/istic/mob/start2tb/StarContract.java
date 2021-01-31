@@ -5,7 +5,7 @@ import android.provider.BaseColumns;
 
 public interface StarContract {
 
-    String AUTHORITY = "fr.istic.mob.horairesbustb.provider.MyContentProvider";
+    String AUTHORITY = "fr.istic.mob.horairesbustb.provider";
 
     Uri AUTHORITY_URI = Uri.parse("content://" + AUTHORITY);
 
@@ -19,6 +19,7 @@ public interface StarContract {
 
         interface BusRouteColumns extends BaseColumns {
             String SHORT_NAME = "route_short_name";
+            String ROUTE_ID = "route_id";
             String LONG_NAME = "route_long_name";
             String DESCRIPTION = "route_desc";
             String TYPE = "route_type";

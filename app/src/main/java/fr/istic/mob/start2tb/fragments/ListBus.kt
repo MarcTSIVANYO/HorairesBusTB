@@ -65,7 +65,7 @@ class ListBus : Fragment() {
 
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        var view: View = inflater.inflate(R.layout.fragment_list_bus, container, false)
+        val view: View = inflater.inflate(R.layout.fragment_list_bus, container, false)
 
         btnDate = view.findViewById(R.id.btndate)
         btnTime = view.findViewById(R.id.btntime)
@@ -131,7 +131,7 @@ class ListBus : Fragment() {
                     // var monthOfYear = monthOfYear + 1
                     var jours: String = dayOfMonth.toString()
                     var mois: String = monthOfYear.toString()
-                    var year: String = year.toString()
+                    val year: String = year.toString()
 
                     if (monthOfYear < 10) {
                         mois = "0" + monthOfYear
@@ -162,7 +162,7 @@ class ListBus : Fragment() {
 
     //retourne la liste des directions
     private fun getDirection(directions: String): ArrayList<String> {
-        var dir: List<String> = directions.split("<>")
+        val dir: List<String> = directions.split("<>")
         listDirections = ArrayList<String>()
         listDirections.add(dir[0])
         listDirections.add(dir[dir.lastIndex])
@@ -229,28 +229,28 @@ class ListBus : Fragment() {
 
     fun chargerInfosBus() {
         val contentResolver = context?.contentResolver
-        var c: Cursor? = null
+        var cursor: Cursor? = null
         val projection: Array<String>? = null
         val selection: String? = null
         val selectionArgs: Array<String>? = null
         val sortOrder: String? = null
         val uriRoute: Uri = Uri.parse(StarContract.BusRoutes.CONTENT_URI.toString())
         val lastPath: String? = uriRoute.lastPathSegment
-        c = contentResolver?.query(uriRoute, projection, selection, selectionArgs, sortOrder)
-        if (c != null) {
-            while (c.moveToNext()) {
-                var busRoute: Route = Route(
-                    c.getString(c.getColumnIndex(StarContract.BusRoutes.BusRouteColumns._ID)), null,
-                    c.getString(c.getColumnIndex(StarContract.BusRoutes.BusRouteColumns.SHORT_NAME)),
-                    c.getString(c.getColumnIndex(StarContract.BusRoutes.BusRouteColumns.LONG_NAME)),
-                    c.getString(c.getColumnIndex(StarContract.BusRoutes.BusRouteColumns.DESCRIPTION)),
-                    c.getString(c.getColumnIndex(StarContract.BusRoutes.BusRouteColumns.TYPE)), null,
-                    c.getString(c.getColumnIndex(StarContract.BusRoutes.BusRouteColumns.COLOR)),
-                    c.getString(c.getColumnIndex(StarContract.BusRoutes.BusRouteColumns.TEXT_COLOR)), null
+        cursor = contentResolver?.query(uriRoute, projection, selection, selectionArgs, sortOrder)
+        if (cursor != null) {
+            while (cursor.moveToNext()) {
+                val busRoute: Route = Route(
+                    cursor.getString(cursor.getColumnIndex(StarContract.BusRoutes.BusRouteColumns.ROUTE_ID)), null,
+                    cursor.getString(cursor.getColumnIndex(StarContract.BusRoutes.BusRouteColumns.SHORT_NAME)),
+                    cursor.getString(cursor.getColumnIndex(StarContract.BusRoutes.BusRouteColumns.LONG_NAME)),
+                    cursor.getString(cursor.getColumnIndex(StarContract.BusRoutes.BusRouteColumns.DESCRIPTION)),
+                    cursor.getString(cursor.getColumnIndex(StarContract.BusRoutes.BusRouteColumns.TYPE)), null,
+                    cursor.getString(cursor.getColumnIndex(StarContract.BusRoutes.BusRouteColumns.COLOR)),
+                    cursor.getString(cursor.getColumnIndex(StarContract.BusRoutes.BusRouteColumns.TEXT_COLOR)), null
                 )
                 myListBus.add(busRoute)
             }
-            c.close()
+            cursor.close()
             this.lbData?.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
             SpinnerBus!!.setAdapter(this.lbData)
         }

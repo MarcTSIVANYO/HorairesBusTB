@@ -21,7 +21,7 @@ class MainActivity :  AppCompatActivity(){
       private var listBus : ListBus = ListBus()
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        // test()
+       //test()
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         fmanager = supportFragmentManager
@@ -44,35 +44,12 @@ class MainActivity :  AppCompatActivity(){
         val selectionArgs: Array<String>? = null
         val sortOrder: String? = null
         val uriRoute: Uri = Uri.parse(StarContract.BusRoutes.CONTENT_URI.toString())
-        val lastPath: String? = uriRoute.lastPathSegment
         cursor = contentResolver?.query(uriRoute, projection, selection, selectionArgs, sortOrder)
 
         if(cursor!=null && cursor.moveToFirst()){
             do {
-                var name = cursor?.getString(cursor?.getColumnIndex(StarContract.BusRoutes.BusRouteColumns.SHORT_NAME))
+                var name = cursor?.getString(cursor?.getColumnIndex(StarContract.BusRoutes.BusRouteColumns.ROUTE_ID))
                 Log.d("test : ", "message :"+name)
-            }while (cursor.moveToNext())
-        }
-        cursor?.close()
-
-        val selectionArgs2=arrayOf("0001")
-        cursor = contentResolver?.query(uriRoute, projection, selection, selectionArgs2, sortOrder)
-        //val cursor2 = contentResolver.query(uriRoute, projection, selection, selectionArgs, sortOrder)
-        if(cursor!=null && cursor.moveToFirst()){
-            do {
-                var name = cursor?.getString(cursor?.getColumnIndex(StarContract.BusRoutes.BusRouteColumns.LONG_NAME))
-                Log.d("test : ", "long name : "+name)
-            }while (cursor.moveToNext())
-        }
-        cursor?.close()
-
-        var selectionArgs3=arrayOf("0001","1")
-        val uriStop: Uri = Uri.parse(StarContract.Stops.CONTENT_URI.toString())
-        cursor = contentResolver?.query(uriStop, projection, selection, selectionArgs3, sortOrder)
-        if(cursor!=null && cursor.moveToFirst()){
-            do {
-                var name = cursor?.getString(cursor?.getColumnIndex(StarContract.Stops.StopColumns.NAME))
-                Log.d("test : ", " Stop name :"+name)
             }while (cursor.moveToNext())
         }
         cursor?.close()
