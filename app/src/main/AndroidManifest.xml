@@ -8,6 +8,10 @@
     <uses-permission android:name="android.permissions.READ_DATABASE"/>
     <uses-permission android:name="android.permissioms.WRITE_DATABASE"/>
 
+    <permission android:name="fr.isitc.mob.horairesbustb.provider.READ_DATABASE" android:protectionLevel="normal" />
+    <permission android:name="fr.isitc.mob.horairesbustb.provider.WRITE_DATABASE" android:protectionLevel="normal" />
+
+
 
     <application
         android:requestLegacyExternalStorage="true"
@@ -25,7 +29,7 @@
         </activity>
 
         <provider
-            android:authorities="fr.istic.mob.horairesbustb.provider.MyContentProvider"
+            android:authorities="fr.istic.mob.horairesbustb.provider"
             android:name=".provider.MyContentProvider"
             android:enabled="true"
             android:exported="true"  />
