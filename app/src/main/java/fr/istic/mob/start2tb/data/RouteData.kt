@@ -1,4 +1,4 @@
-package fr.istic.mob.start2tb.Data
+package fr.istic.mob.start2tb.data
 
 import android.content.Context
 import android.view.LayoutInflater

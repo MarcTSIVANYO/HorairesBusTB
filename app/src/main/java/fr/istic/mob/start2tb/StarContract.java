@@ -3,6 +3,8 @@ package fr.istic.mob.start2tb;
 import android.net.Uri;
 import android.provider.BaseColumns;
 
+import org.jetbrains.annotations.Nullable;
+
 public interface StarContract {
 
     String AUTHORITY = "fr.istic.mob.horairesbustb.provider";
@@ -55,11 +57,12 @@ public interface StarContract {
                 "vnd.android.cursor.item/vnd.fr.istic.mob.horairesbustb.stop";
 
         interface StopColumns extends BaseColumns {
+            String STOP_ID= "stop_id";
             String NAME = "stop_name";
             String DESCRIPTION = "stop_desc";
             String LATITUDE = "stop_lat";
             String LONGITUDE = "stop_lon";
-            String WHEELCHAIR_BOARDING = "wheelchair_boarding";
+            String WHEELCHAIR_BOARDING = "wheelchair_accessible";
         }
     }
 

@@ -6,8 +6,6 @@ import androidx.room.PrimaryKey
 
 @Entity(tableName="stop_times")
 data class StopTime(
-    @PrimaryKey(autoGenerate = true)
-    val id: Int,
     @ColumnInfo(name = "trip_id")
     val tripId: String?,
     @ColumnInfo(name = "arrival_time")
@@ -18,12 +16,10 @@ data class StopTime(
     val stopId: String?,
     @ColumnInfo(name = "stop_sequence")
     val sequence: String?,
-    @ColumnInfo(name = "stop_headsign")
-    val headSign: String?,
-    @ColumnInfo(name = "pickup_type")
-    val pickupType: String?,
-    @ColumnInfo(name = "drop_off_type")
-    val dropOffType: String?,
-    @ColumnInfo(name = "shape_dist_traveled")
-    val shapeDistTraveled: String?
-)
+
+){
+    var stopName: String? = null
+    fun setNomArret(stopName : String){
+        this.stopName = stopName
+    }
+}

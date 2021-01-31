@@ -12,18 +12,28 @@
         android:orientation="vertical">
 
         <TextView
-            android:id="@+id/textView"
+            android:id="@+id/textView2"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:editable="false"
-            android:gravity="center_horizontal"
-            android:text="Liste des arrêts" />
+            android:layout_height="58dp"
+            android:text="Liste des Arrêts"
+            android:textColor="@color/black"
+            android:textSize="30sp"
+            android:layout_margin="36sp" />
 
         <ListView
             android:id="@+id/idArrets"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent" />
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:divider="@color/material_blue_grey_800"
+            android:dividerHeight="1dp"
+            android:footerDividersEnabled="false"/>
+
 
     </LinearLayout>
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/btntValid"
+        android:text="go" />
 
 </FrameLayout>

@@ -1,4 +1,4 @@
-package fr.istic.mob.start2tb.Data
+package fr.istic.mob.start2tb.data
 
 import android.content.Context
 import android.graphics.Color
@@ -21,10 +21,10 @@ class ListBusData(context: Context, resource: Int, list: ArrayList<Route>) :
 
         if (convertView == null) {
             layoutView = LayoutInflater.from(context).inflate(R.layout.un_bus, parent, false)
-            viewHolder= MyViewHolder(layoutView)
-            layoutView.tag=viewHolder
+            viewHolder = MyViewHolder(layoutView)
+            layoutView.tag = viewHolder
         } else {
-            viewHolder=convertView.tag as MyViewHolder
+            viewHolder = convertView.tag as MyViewHolder
             layoutView = convertView
         }
 
@@ -44,8 +44,8 @@ class ListBusData(context: Context, resource: Int, list: ArrayList<Route>) :
 
     }
 
-    class MyViewHolder(view :View) {
-        val txt:TextView=view.findViewById(R.id.LineNumber)
+    private class MyViewHolder(view: View) {
+        val txt: TextView = view.findViewById(R.id.LineNumber)
     }
 }
 

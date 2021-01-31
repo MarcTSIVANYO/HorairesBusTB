@@ -1,6 +1,5 @@
 package fr.istic.mob.start2tb.fragments
 
-import android.app.Activity
 import android.database.Cursor
 import android.net.Uri
 import android.os.Bundle
@@ -9,14 +8,12 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.AdapterView
 import android.widget.ArrayAdapter
+import android.widget.Button
 import android.widget.ListView
 import androidx.annotation.Nullable
-import androidx.fragment.app.FragmentManager
-import fr.istic.mob.horairesbustb.model.Stop
 import fr.istic.mob.horairesbustb.model.StopTime
-import fr.istic.mob.start2tb.Data.HoraireData
+import fr.istic.mob.start2tb.data.HoraireData
 import fr.istic.mob.start2tb.MainActivity
 import fr.istic.mob.start2tb.MyListenner
 import fr.istic.mob.start2tb.R
@@ -32,7 +29,8 @@ private const val ARG_PARAM2 = "param2"
  * Use the [HoraireBus.newInstance] factory method to
  * create an instance of this fragment.
  */
-class HoraireBus(id_arret: String, id_bus: String, dir: Int, date: String, time: String)  : Fragment() {
+class HoraireBus(id_arret: String, id_bus: String, dir: Int, date: String, time: String) :
+    Fragment() {
 
 
     private lateinit var mActivite: MainActivity
@@ -40,12 +38,13 @@ class HoraireBus(id_arret: String, id_bus: String, dir: Int, date: String, time:
     private var listeHoraireBus: ArrayList<StopTime> = ArrayList<StopTime>()
     private lateinit var sData: HoraireBus
     private var dir: Int = 0
-    private lateinit var id_arret: String
-    private lateinit var date: String
-    private lateinit var time: String
+    private var id_arret: String = ""
+    private var date: String = ""
+    private var time: String = ""
     private var TAG: String = "TITLE"
     private lateinit var listView: ListView
-    lateinit var idbus: String
+    var idbus: String = ""
+    private var btnValid: Button? = null
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -53,17 +52,38 @@ class HoraireBus(id_arret: String, id_bus: String, dir: Int, date: String, time:
         Log.d(TAG, "oncreate")
     }
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        var view: View = inflater.inflate(R.layout.fragment_horaire_bus, container, false)
-        this.listView = view.findViewById(R.id.idHoraire)
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View {
+
+        val view: View = inflater.inflate(R.layout.fragment_horaire_bus, container, false)
+        this.listView = view.findViewById(R.id.idlisteHoraires)
+        btnValid = view.findViewById(R.id.btntValid)
         chargerInfosBusHoraire(id_arret, idbus, date, time, dir)
-        var data: ArrayAdapter<StopTime> = HoraireData(context!!, 0, listeHoraireBus)
+        val data: ArrayAdapter<StopTime> = HoraireData(context!!, 0, listeHoraireBus)
         this.listView.setAdapter(data)
         listView.setOnItemClickListener { adapterView, view, position, id ->
-            val selectedStopTime : StopTime = listeHoraireBus?.get(position)
-            val idStopTime : String = selectedStopTime.tripId.toString()
-            horaireSelected(idStopTime, selectedStopTime.arrival.toString() )
+
+            val selectedStopTime: StopTime = listeHoraireBus.get(position)
+            val idStopTime: String = selectedStopTime.tripId.toString()
+            horaireSelected(idStopTime, selectedStopTime.arrival.toString())
         }
+
+        /* btnValid!!.setOnClickListener(object : View.OnClickListener {
+
+             @SuppressLint("ResourceType")
+             override fun onClick(v: View?) {
+                 val routeBus: RouteBus = RouteBus()
+                 val fg: Fragment? = routeBus.newInstance()
+                 if (fg != null) {
+                     fragmentManager!!.beginTransaction().replace(R.id.frame, routeBus).addToBackStack("ArretBus").commit()
+                 }
+
+             }
+         })*/
+
         return view
     }
 
@@ -73,14 +93,30 @@ class HoraireBus(id_arret: String, id_bus: String, dir: Int, date: String, time:
 
     }
 
-
     fun horaireSelected(idTrip: String, time: String) {
-        val routeBus: RouteBus = RouteBus(idTrip, time)
-        val fragmentManager: FragmentManager? = null
-        fragmentManager?.beginTransaction()?.replace(R.id.frame, routeBus, "routeBus")?.addToBackStack("routeBus")?.commit()
+        //val routeBus: RouteBus = RouteBus(idTrip, time)
+        val routeBus: RouteBus = RouteBus()
+        val fg: Fragment? = routeBus.newInstance()
+        if (fg != null) {
+            fragmentManager!!.beginTransaction().setCustomAnimations(R.anim.enter, R.anim.exit)
+                .replace(R.id.frame, routeBus).addToBackStack("ArretBus").commit()
+        }
+
     }
-    fun chargerInfosBusHoraire(idArret: String, idbus: String, date: String, heure: String, direction: Int) {
-        var c: Cursor? = null
+
+    fun newInstance(): Fragment? {
+        val mFrgment = HoraireBus(id_arret, idbus, dir, date, time)
+        return mFrgment
+    }
+
+    fun chargerInfosBusHoraire(
+        idArret: String,
+        idbus: String,
+        date: String,
+        heure: String,
+        direction: Int
+    ) {
+        var cursor: Cursor? = null
         val projection: Array<String>? = null
         val selection: String? = null
         val sortOrder: String? = null
@@ -91,29 +127,25 @@ class HoraireBus(id_arret: String, id_bus: String, dir: Int, date: String, time:
         }
         val selectionArgs: Array<String>? =
             arrayOf<String>(idArret, idbus, date, heure, myDirection)
-        c = activity?.managedQuery(uriHoraire, projection, selection, selectionArgs, sortOrder)
-        if (c != null) {
-            while (c.moveToNext()) {
+        cursor = activity?.managedQuery(uriHoraire, projection, selection, selectionArgs, sortOrder)
+        if (cursor != null) {
+            while (cursor.moveToNext()) {
                 var busStopTime: StopTime = StopTime(
-                    0,
-                    c.getString(c.getColumnIndex(StarContract.StopTimes.StopTimeColumns.TRIP_ID)),
-                    c.getString(c.getColumnIndex(StarContract.StopTimes.StopTimeColumns.ARRIVAL_TIME)),
-                    c.getString(c.getColumnIndex(StarContract.StopTimes.StopTimeColumns.DEPARTURE_TIME)),
-                    c.getString(c.getColumnIndex(StarContract.StopTimes.StopTimeColumns.STOP_ID)),
-                    c.getString(c.getColumnIndex(StarContract.StopTimes.StopTimeColumns.STOP_SEQUENCE)),
-                    null,
-                    null,
-                    null,
-                    null
-                )
-                listeHoraireBus.add(busStopTime)
+                    cursor.getString(cursor.getColumnIndex(StarContract.StopTimes.StopTimeColumns.TRIP_ID)),
+                    cursor.getString(cursor.getColumnIndex(StarContract.StopTimes.StopTimeColumns.ARRIVAL_TIME)),
+                    cursor.getString(cursor.getColumnIndex(StarContract.StopTimes.StopTimeColumns.DEPARTURE_TIME)),
+                    cursor.getString(cursor.getColumnIndex(StarContract.StopTimes.StopTimeColumns.STOP_ID)),
+                    cursor.getString(cursor.getColumnIndex(StarContract.StopTimes.StopTimeColumns.STOP_SEQUENCE)),
 
+                    )
+                listeHoraireBus.add(busStopTime)
             }
-            c.close()
+            cursor.close()
 
         }
 
     }
+
     override fun onStart() {
         super.onStart()
         Log.d(TAG, "oncreate")

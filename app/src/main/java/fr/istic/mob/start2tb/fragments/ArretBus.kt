@@ -1,5 +1,6 @@
 package fr.istic.mob.start2tb.fragments
 
+import android.content.Context
 import android.database.Cursor
 import android.net.Uri
 import android.os.Bundle
@@ -8,106 +9,105 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.*
-import android.widget.AdapterView.OnItemClickListener
 import androidx.annotation.Nullable
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.FragmentManager
 import fr.istic.mob.horairesbustb.model.Stop
-import fr.istic.mob.start2tb.Data.StopData
-import fr.istic.mob.start2tb.MainActivity
-import fr.istic.mob.start2tb.MyListenner
+import fr.istic.mob.start2tb.data.StopData
 import fr.istic.mob.start2tb.R
 import fr.istic.mob.start2tb.StarContract
-import fr.istic.mob.start2tb.ViewModel.MyViewModel
 
 
-class ArretBus(direction: Int, id_route: String, date: String, heure: String) : Fragment() {
+class ArretBus(val dir: Int, val idRoute: String, val date: String, val time: String) : Fragment() {
 
-    private lateinit var textView: TextView
-    private lateinit var mActivite: MainActivity
-    private lateinit var myFragmentListnner: MyListenner
-    private var listeArret: ArrayList<Stop> =  ArrayList<Stop>()
-    private lateinit var sData: StopData
+    private var listeArret: ArrayList<Stop> = ArrayList<Stop>()
     private lateinit var listView: ListView
-    private  var dir: Int = 0
-    private lateinit var idRoute: String
-    private lateinit var date: String
-    private lateinit var time: String
-    lateinit var myViewModel : MyViewModel
-    private  var TAG: String = "TITLE"
+    private var TAG: String = "TITLE"
     private lateinit var data: ArrayAdapter<Stop>
+    private var btnValid: Button? = null
+    private lateinit var mContext: Context
 
-
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        var view: View = inflater.inflate(R.layout.fragment_arret_bus, container, false)
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View? {
+        val view: View = inflater.inflate(R.layout.fragment_arret_bus, container, false)
         this.listView = view.findViewById(R.id.idArrets)
-        chargerInfosArret(this.dir, this.idRoute)
-        data = StopData(context!!, 0, listeArret)
+        btnValid = view.findViewById(R.id.btntValid)
+        data = StopData(mContext, 0, listeArret)
+        chargerInfosArret(dir, idRoute)
         this.listView.setAdapter(data)
         listView.setOnItemClickListener { adapterView, view, position, id ->
-            val selectedStop : Stop  = listeArret?.get(position)
-            val idStop : String = selectedStop.id.toString()
-            arretSelected(idStop, idRoute,dir, date,time)
+            val selectedStop: Stop = listeArret?.get(position)
+            val idStop: String = selectedStop.id.toString()
+            arretSelected(idStop, idRoute, dir, date, time)
         }
-
         return view
     }
-    fun arretSelected(id_arret: String, id_bus: String, dir: Int, date: String, time: String) {
-        var horaireBus: HoraireBus = HoraireBus(id_arret, id_bus, dir, date, time)
-        val fragmentManager: FragmentManager? = null
-        fragmentManager?.beginTransaction()?.replace(R.id.frame, horaireBus, "horaireBus")?.addToBackStack("horaireBus")?.commit()
+
+    override fun onAttach(context: Context) {
+        super.onAttach(context)
+        mContext = context
     }
-    override fun onActivityCreated(@Nullable savedInstanceState: Bundle?){
+
+    fun arretSelected(id_arret: String, id_bus: String, dir: Int, date: String, time: String) {
+        val horaireBus: HoraireBus = HoraireBus(id_arret, id_bus, dir, date, time)
+        val fg: Fragment? = horaireBus.newInstance()
+        if (fg != null) {
+            fragmentManager!!.beginTransaction()?.setCustomAnimations(R.anim.enter, R.anim.exit)
+                .replace(R.id.frame, horaireBus).addToBackStack("ArretBus").commit()
+        }
+    }
+
+    override fun onActivityCreated(@Nullable savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
-        if( savedInstanceState != null ){
+        if (savedInstanceState != null) {
             listeArret = savedInstanceState.getSerializable("Liste_Arrêts") as ArrayList<Stop>
             this.listView = activity?.findViewById(R.id.idArrets)!!
-            data= StopData(context!!, 0, listeArret)
+            data = StopData(context!!, 0, listeArret)
             this.listView.setAdapter(data)
-
-
         }
+    }
 
+    fun newInstance(): Fragment? {
+        val mFrgment = ArretBus(dir, idRoute, date, time)
+        return mFrgment
     }
 
     fun chargerInfosArret(dir: Int, idRoute: String) {
-        var c: Cursor? = null
+
+        var cursor: Cursor? = null
         val projection: Array<String>? = null
         val selection: String? = null
         val sortOrder: String? = null
         val uriStop: Uri = Uri.parse(StarContract.Stops.CONTENT_URI.toString())
-        val lastPath: String? = uriStop.lastPathSegment
-        var dirStrg = Integer.toString(dir)
-        var selectionArgs = arrayOf<String>(idRoute, dirStrg)
+        val dirStrg = Integer.toString(dir)
+        val selectionArgs = arrayOf<String>(idRoute, dirStrg)
 
-        c = activity?.managedQuery(uriStop, projection, selection, selectionArgs, sortOrder)
-        if (c != null) {
-            while (c.moveToNext()) {
-                var busStops: Stop = Stop(
-                    c.getString(c.getColumnIndex(StarContract.Stops.StopColumns._ID)),
-                    null,
-                    c.getString(c.getColumnIndex(StarContract.Stops.StopColumns.NAME)),
-                    c.getString(c.getColumnIndex(StarContract.Stops.StopColumns.DESCRIPTION)),
-                    c.getString(c.getColumnIndex(StarContract.Stops.StopColumns.LATITUDE)),
-                    c.getString(c.getColumnIndex(StarContract.Stops.StopColumns.LONGITUDE)),
-                    null,
-                    null,
-                    null,
-                    null,
-                    null,
-                    c.getString(c.getColumnIndex(StarContract.Stops.StopColumns.WHEELCHAIR_BOARDING))
+        cursor = activity?.managedQuery(uriStop, projection, selection, selectionArgs, sortOrder)
+        if (cursor != null) {
+            while (cursor.moveToNext()) {
+                val busStops: Stop = Stop(
+                    cursor.getString(cursor.getColumnIndex(StarContract.Stops.StopColumns.STOP_ID)),
+                    cursor.getString(cursor.getColumnIndex(StarContract.Stops.StopColumns.NAME)),
+                    cursor.getString(cursor.getColumnIndex(StarContract.Stops.StopColumns.DESCRIPTION)),
+                    cursor.getString(cursor.getColumnIndex(StarContract.Stops.StopColumns.LATITUDE)),
+                    cursor.getString(cursor.getColumnIndex(StarContract.Stops.StopColumns.LONGITUDE))
 
                 )
                 listeArret.add(busStops)
                 data.notifyDataSetChanged()
+                Log.d("test : ", "Bus name : " + busStops.name)
             }
-            c.close()
+            cursor.close()
         }
     }
+
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
         outState.putSerializable("Liste_Arrêts", listeArret)
     }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         Log.d(TAG, "oncreate")

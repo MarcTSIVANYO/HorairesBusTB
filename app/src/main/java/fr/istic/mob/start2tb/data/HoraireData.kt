@@ -1,4 +1,4 @@
-package fr.istic.mob.start2tb.Data
+package fr.istic.mob.start2tb.data
 
 import android.content.Context
 import android.view.LayoutInflater
@@ -6,7 +6,6 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ArrayAdapter
 import android.widget.TextView
-import fr.istic.mob.horairesbustb.model.Stop
 import fr.istic.mob.horairesbustb.model.StopTime
 import fr.istic.mob.start2tb.R
 

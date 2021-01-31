@@ -3,10 +3,27 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".fragments.RouteBus">
+    tools:context=".fragments.RouteBus"
+    android:orientation="vertical">
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+    <TextView
+        android:id="@+id/textView3"
+        android:layout_width="match_parent"
+        android:layout_height="58dp"
+        android:text="Horaires de pasage"
+        android:textColor="@color/black"
+        android:textSize="30sp"
+        android:layout_margin="36sp" />
     <ListView
         android:id="@+id/listViewHoraire"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent" />
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:divider="@color/material_blue_grey_800"
+        android:dividerHeight="1dp"
+        android:footerDividersEnabled="false"/>
 
+    </LinearLayout>
 </FrameLayout>
