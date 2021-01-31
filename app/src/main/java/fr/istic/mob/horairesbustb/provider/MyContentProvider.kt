@@ -21,7 +21,6 @@ class MyContentProvider : ContentProvider() {
             throw  NullPointerException()
         }
 
-        Log.i("error", "test 1")
         db = Room.databaseBuilder(
                 context!!,
                 AppDatabase::class.java, DATABASE_NAME
@@ -48,13 +47,13 @@ class MyContentProvider : ContentProvider() {
                     }
 
                 StarContract.Trips.CONTENT_URI.toString() -> cursor = db?.tripDao()?.getAllDataTrip()
-                StarContract.Stops.CONTENT_URI.toString() -> cursor = db?.stopDao()?.getAllDataStop()
-                StarContract.Stops.CONTENT_URI.toString() ->
-                    if(selectionArgs.isNullOrEmpty()){
-                        cursor = db?.stopDao()?.getAllDataStop()
+
+                StarContract.Stops.CONTENT_URI.toString() ->cursor =db?.stopDao()?.getStops("0001", "1")
+                    /*if(selectionArgs.isNullOrEmpty()){
+                        //cursor = db?.stopDao()?.getAllDataStop()
                     }else{
                         cursor = db?.stopDao()?.getStops(selectionArgs?.get(0), selectionArgs?.get(1))
-                    }
+                    }*/
                 else -> throw IllegalArgumentException("Unknown URI")
             }
         }
