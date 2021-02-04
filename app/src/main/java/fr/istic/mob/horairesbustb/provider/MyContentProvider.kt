@@ -48,12 +48,15 @@ class MyContentProvider : ContentProvider() {
 
                 StarContract.Trips.CONTENT_URI.toString() -> cursor = db?.tripDao()?.getAllDataTrip()
 
-                StarContract.Stops.CONTENT_URI.toString() ->cursor =db?.stopDao()?.getStops("0001", "1")
-                    /*if(selectionArgs.isNullOrEmpty()){
-                        //cursor = db?.stopDao()?.getAllDataStop()
+                StarContract.Stops.CONTENT_URI.toString() ->
+                    //cursor =db?.stopDao()?.getStops("0001", "1")
+                    if(selectionArgs.isNullOrEmpty()){
+                        cursor = db?.stopDao()?.getAllDataStop()
                     }else{
+                        Log.d("test : ", "Param 1 :"+selectionArgs?.get(0))
+                        Log.d("test : ", "Param 2 dir  :"+selectionArgs?.get(1))
                         cursor = db?.stopDao()?.getStops(selectionArgs?.get(0), selectionArgs?.get(1))
-                    }*/
+                    }
                 else -> throw IllegalArgumentException("Unknown URI")
             }
         }
