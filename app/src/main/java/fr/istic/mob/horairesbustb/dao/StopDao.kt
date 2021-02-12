@@ -12,6 +12,9 @@ interface StopDao {
     fun getAllDataStop(): Cursor
 
 
+    @Query(value = "SELECT * FROM stops WHERE stop_name LIKE :name ")
+    fun getLikeStop(name : String?): Cursor
+
     @Query("SELECT DISTINCT s.stop_name, s.stop_id,s.stop_desc,s.stop_lat,s.stop_lon FROM stops s, stop_times st, trips t WHERE s.stop_id = st.stop_id AND st.trip_id = t.trip_id AND t.route_id = :routeId and direction_id = :directionId ORDER by CAST(st.stop_sequence AS INTEGER)")
     fun getStops(routeId: String?, directionId: String?): Cursor
 

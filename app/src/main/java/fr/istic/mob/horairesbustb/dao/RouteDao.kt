@@ -11,6 +11,8 @@ interface RouteDao {
     @Query(value = "SELECT * FROM routes ORDER BY route_id ASC")
     fun getAllDataRoute(): Cursor
 
+    @Query(value = "SELECT * FROM routes WHERE route_long_name LIKE :name OR route_short_name LIKE :name ")
+    fun getLikeRoute(name : String?): Cursor
 
     @Query(value = "SELECT * FROM routes WHERE route_id =:route_id")
     fun getDirectionRoute(route_id:String?): Cursor
